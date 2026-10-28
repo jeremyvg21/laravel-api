@@ -21,3 +21,12 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+*.bak
+*.zip
+.env
+.env.*
+!.env.example
+/vendor/
+/node_modules/
+.phpunit.result.cache

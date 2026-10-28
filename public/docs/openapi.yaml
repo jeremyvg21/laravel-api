@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: Overskull Inventario API
+  version: 1.0.0
+  description: CRUD de productos y categorías con auditoría de cambios.
+servers:
+  - url: http://127.0.0.1:8000/api
+paths:
+  /dashboard:
+    get:
+      summary: Indicadores del inventario
+      tags: [Dashboard]
+      responses:
+        '200': {description: Resumen correcto}
+  /categories:
+    get:
+      summary: Listar categorías
+      tags: [Categorías]
+      responses:
+        '200': {description: Categorías obtenidas}
+    post:
+      summary: Crear categoría
+      tags: [Categorías]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CategoryInput'}
+      responses:
+        '201': {description: Categoría creada}
+        '422': {description: Datos inválidos}
+  /categories/{category}:
+    parameters:
+      - name: category
+        in: path
+        required: true
+        schema: {type: integer}
+    get:
+      summary: Consultar categoría
+      tags: [Categorías]
+      responses:
+        '200': {description: Categoría encontrada}
+        '404': {description: No encontrada}
+    put:
+      summary: Actualizar categoría
+      tags: [Categorías]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CategoryInput'}
+      responses:
+        '200': {description: Categoría actualizada}
+        '422': {description: Datos inválidos}
+    delete:
+      summary: Eliminar categoría
+      tags: [Categorías]
+      responses:
+        '200': {description: Categoría eliminada}
+        '409': {description: Tiene productos asociados}
+  /products:
+    get:
+      summary: Listar productos
+      tags: [Productos]
+      parameters:
+        - {name: search, in: query, schema: {type: string}}
+        - {name: category_id, in: query, schema: {type: integer}}
+      responses:
+        '200': {description: Productos obtenidos}
+    post:
+      summary: Crear producto
+      tags: [Productos]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ProductInput'}
+      responses:
+        '201': {description: Producto creado}
+        '422': {description: Datos inválidos}
+  /products/{product}:
+    parameters:
+      - name: product
+        in: path
+        required: true
+        schema: {type: integer}
+    get:
+      summary: Consultar producto
+      tags: [Productos]
+      responses:
+        '200': {description: Producto encontrado}
+        '404': {description: No encontrado}
+    put:
+      summary: Actualizar producto
+      tags: [Productos]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ProductInput'}
+      responses:
+        '200': {description: Producto actualizado}
+        '422': {description: Datos inválidos}
+    delete:
+      summary: Eliminar producto
+      tags: [Productos]
+      responses:
+        '200': {description: Producto eliminado}
+components:
+  schemas:
+    CategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, maxLength: 255, example: Tecnología}
+        description: {type: string, nullable: true, example: Accesorios electrónicos}
+    ProductInput:
+      type: object
+      required: [name, price, stock, category_id]
+      properties:
+        name: {type: string, maxLength: 255, example: Mouse inalámbrico}
+        description: {type: string, nullable: true}
+        price: {type: number, minimum: 0.01, multipleOf: 0.01, example: 59.90}
+        stock: {type: integer, minimum: 0, example: 10}
+        category_id: {type: integer, example: 1}
