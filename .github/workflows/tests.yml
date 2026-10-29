@@ -3,11 +3,10 @@ name: Tests
 on:
   push:
     branches:
-      - master
-      - '*.x'
+      - main
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -17,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [8.2, 8.3, 8.4]
+        php: ['8.2', '8.3', '8.4']
 
     name: PHP ${{ matrix.php }}
 
@@ -31,7 +30,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_sqlite
           coverage: none
 
       - name: Install Composer dependencies
@@ -42,6 +41,11 @@ jobs:
 
       - name: Generate app key
         run: php artisan key:generate
+
+      - name: Prepare SQLite test database
+        run: |
+          touch database/database.sqlite
+          php artisan migrate --force
 
       - name: Execute tests
         run: vendor/bin/phpunit
